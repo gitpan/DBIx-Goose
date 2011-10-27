@@ -11,7 +11,7 @@ use SQL::Abstract::More;
 our $sql = SQL::Abstract::More->new;
 use vars qw/$sql/;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =head2 fetch
 
@@ -170,6 +170,7 @@ sub search {
         primary_key => $self->{primary_key},
         r           => $self->{r},
         rs          => $self->{rs},
+        schema      => $self->{schema},
     };
     return bless $result, $self->{rs};
 }
@@ -206,6 +207,7 @@ sub insert {
     
     if ($res->count) {
         my $rs = {
+            schema => $self->{schema},
             dbh    => $self->{dbh},
             where  => $c,
             table  => $self->{table},
@@ -247,6 +249,7 @@ sub update {
             %args,
         );
         my $rs = {
+            schema => $self->{schema},
             dbh    => $self->{dbh},
             where  => $self->{where},
             table  => $self->{table},
@@ -320,6 +323,25 @@ sub method {
     *$key = sub { $args{$key}->($self); };
 
     bless \*$key, $self->{rs};
+}
+
+=head2 schema
+
+Return the current schema to perform searches on other resultsets
+
+    sub my_resultset_method {
+        my $self = shift;
+        my $schema = $self->schema;
+        
+        my $rs = $schema->resultset('AnotherResultSet')->all;
+    }
+
+=cut
+
+sub schema {
+    my $self = shift;
+    
+    return $self->{schema};
 }
 
 1;

@@ -1,12 +1,12 @@
 package DBIx::Goose::Schema;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub resultset {
     my ($self, $table) = @_;
 
     my $pkg = "$self->{schema}::ResultSet::$table";
-    $self->{resultset} = { dbh => $self->{dbh}, rs => $pkg, r => "$self->{schema}::Result::$table", table => $pkg->table };
+    $self->{resultset} = { dbh => $self->{dbh}, rs => $pkg, r => "$self->{schema}::Result::$table", table => $pkg->table, schema => $self };
     return bless $self->{resultset}, "$self->{schema}::ResultSet::$table";
 }
 
