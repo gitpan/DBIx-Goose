@@ -24,7 +24,8 @@ requires:
   DBD::SQLite: 0
   Module::Finder: 0
   SQL::Abstract::More: 0
+  Test::Most: 0
   perl: 5.10.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.03
+version: 0.04

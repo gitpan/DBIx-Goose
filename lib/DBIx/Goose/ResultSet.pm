@@ -11,7 +11,7 @@ use SQL::Abstract::More;
 our $sql = SQL::Abstract::More->new;
 use vars qw/$sql/;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head2 fetch
 
@@ -142,24 +142,37 @@ The second parameter is a hash of keys and values of what to search for.
 
 sub search {
     my ($self, $fields, $c, $order) = @_;
+
     if (scalar @$fields == 0) { push @$fields, '*'; }
     if (exists $self->{where}) {
         for (keys %{$self->{where}}) {
             $c->{$_} = $self->{where}->{$_};
         }
     }
-        
+
+    $order->{rows}
+        if exists $self->{rows};
+    $order->{page}
+        if exists $self->{page};
+
     my %args;
     $args{-columns} = $fields;
     $args{-from} = $self->{table};
     $args{-where} = $c;
     $args{-order_by} = $order->{order} if exists $order->{order};
-    $args{-limit} = $order->{limit} if exists $order->{limit};
+    if (exists $order->{rows}) {
+        if (exists $order->{page}) {
+            $args{-page_size} = $order->{rows};
+        }
+        else { $args{-limit} = $order->{rows}; }
+    }
+    $args{-page_index} = $order->{page} if exists $order->{page};
     my ($stmt, @bind) = $sql->select(
         %args,
     );
+    #my ($stmt, @bind) = $sql->select($self->{table}, $fields, $c);
     my ($wstmt, @wbind) = $sql->where($c);
-        
+
     my $result = {
         dbh    => $self->{dbh},
         result => $self->{dbh}->selectall_arrayref($stmt, { Slice => {} }, @bind),
@@ -170,8 +183,13 @@ sub search {
         primary_key => $self->{primary_key},
         r           => $self->{r},
         rs          => $self->{rs},
-        schema      => $self->{schema},
     };
+    $result->{rows} = $order->{rows}
+        if exists $order->{rows};
+
+    $result->{page} = $order->{page}
+        if exists $order->{page};
+
     return bless $result, $self->{rs};
 }
 

@@ -9,6 +9,8 @@ build_requires 'Test::More';
 requires 'Module::Finder';
 requires 'SQL::Abstract::More';
 requires 'DBD::SQLite';
+requires 'Test::Most';
+
 auto_install;
 
 WriteAll;

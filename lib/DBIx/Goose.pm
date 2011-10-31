@@ -9,7 +9,7 @@ use base qw/
     DBIx::Goose::Result
 /;
 
-$DBIx::Goose::VERSION = '0.03';
+$DBIx::Goose::VERSION = '0.04';
 
 =head1 NAME
 
